@@ -17,6 +17,8 @@ def main():
         start = end - datetime.timedelta(days=LAST_X_DAYS)
         df = client.get_last_x_days_price(EPIC, RESULO, start, end)
         pass
+    else:
+        an
 
 
 if __name__ == '__main__':
