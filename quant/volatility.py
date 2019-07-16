@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from quant import Quant
 
@@ -8,7 +9,9 @@ class Volatility(Quant):
         self.drop_origin_cols()
 
     def most_volatility_hour(self):
-        self.df = pd.cut(abs(self.df['mid_Close']-self.df['mid_Open']), 10)
+        self.df['volatility'] = abs(self.df['mid_High']-self.df['mid_Close'])
+        self.df['vola_rank'] = pd.cut(self.df['volatility'], 10, labels=[0,1,2,3,4,5,6,7,8,9])
+        self.df = self.df.sort_values(by=['rank'], ascending=False)
         pass
 
 
