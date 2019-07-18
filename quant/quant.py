@@ -7,7 +7,16 @@ class Quant():
         self.raw_df.rename(columns={'last_Volume': 'volume'}, inplace=True)
         self.resolution = resolution
         self.df = self.add_mid(self.raw_df)
-        # Todo: split datetime column to date and hour
+        self.split_dt()
+
+    def split_dt(self):
+        _dt = pd.to_datetime(self.df['DateTime'])
+        self.df['date'] = _dt.dt.date
+        self.df['weekday'] = _dt.dt.weekday
+        self.df['hour'] = _dt.dt.hour
+        self.df['minute'] = _dt.dt.minute
+        self.df['second'] = _dt.dt.second
+
 
     def add_mid(self, df):
         col_names = list(df.columns)
@@ -20,3 +29,12 @@ class Quant():
         cols_to_drop = set(self.df.columns)
         cols_to_drop = set([c for c in cols_to_drop if "_" in c and 'mid' not in c])
         self.df = self.df.drop(cols_to_drop, axis=1)
+
+    def insert(self, name, func, rank=False):
+        self.df[name] = func()
+        if rank:
+            rank_col_name = name +'_rank'
+            self.df[rank_col_name] = pd.cut(self.df[name], 10, labels=range(1, 11))
+            self.df.sort_values(by=[rank_col_name], ascending=False, inplace=True)
+
+

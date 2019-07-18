@@ -8,16 +8,19 @@ class Volatility(Quant):
         super(Volatility, self).__init__(path, resolution)
         self.drop_origin_cols()
 
-    def most_volatility_hour(self):
-        self.df['volatility'] = abs(self.df['mid_High']-self.df['mid_Close'])
-        self.df['vola_rank'] = pd.cut(self.df['volatility'], 10, labels=[0,1,2,3,4,5,6,7,8,9])
-        self.df = self.df.sort_values(by=['rank'], ascending=False)
-        pass
+    def volatility_rank_hour(self):
+        return self.df \
+            .pivot_table(index='hour',
+                         columns='volatility_rank',
+                         values='DateTime',
+                         aggfunc=np.size)
 
 
 if __name__ == '__main__':
     v = Volatility(path=r'../data/EURUSD_Hourly.csv', resolution='H')
-    v.most_volatility_hour()
+    v.insert(name='volatility', func=lambda:abs(v.df['mid_High']-v.df['mid_Close']), rank=True)
+    rank_hour_df = v.volatility_rank_hour()
+    print(rank_hour_df)
 
 
 
