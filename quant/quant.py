@@ -35,6 +35,5 @@ class Quant():
         if rank:
             rank_col_name = name +'_rank'
             self.df[rank_col_name] = pd.cut(self.df[name], 10, labels=range(1, 11))
-            self.df.sort_values(by=[rank_col_name], ascending=False, inplace=True)
 
 
