@@ -113,5 +113,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .idea/
+data/
 trading_ig_config.py
 .DS_Store

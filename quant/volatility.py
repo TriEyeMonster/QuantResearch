@@ -15,12 +15,20 @@ class Volatility(Quant):
                          values='DateTime',
                          aggfunc=np.size)
 
+    def volatility_rank_weekday(self):
+        return self.df \
+            .pivot_table(index='weekday',
+                         columns='volatility_rank',
+                         values='DateTime',
+                         aggfunc=np.size)
+
+
 
 if __name__ == '__main__':
     v = Volatility(path=r'../data/EURUSD_Hourly.csv', resolution='H')
     v.insert(name='volatility', func=lambda:abs(v.df['mid_High']-v.df['mid_Close']), rank=True)
-    rank_hour_df = v.volatility_rank_hour()
-    print(rank_hour_df)
+    # print(v.volatility_rank_hour())
+    print(v.volatility_rank_weekday())
 
 
 

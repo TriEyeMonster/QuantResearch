@@ -27,5 +27,5 @@ class Client(IGService):
 
     def get_last_x_days_price(self, EPIC, RESULO, start_date, end_date):
         response = self.fetch_historical_prices_by_epic_and_date_range(EPIC, RESULO, start_date, end_date)
-        return response['price']
+        return response['prices']
 
