@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LogisticRegression as LR
-# from sklearn.linear_model import RandomizedLogisticRegression as RLR
 
 from quant import Quant
 
@@ -27,25 +25,24 @@ class Volatility(Quant):
     def vola_x_volume(self):
         self.df = self.df.sort_values(by=['DateTime'], ascending=True) \
             .assign(shift_vola=self.df.volatility.shift(-1)) \
-            .assign(vola_ratio=self.df.volatility/abs(self.df.mid_Close - self.df.mid_Open)) \
+            .assign(shift_rank=self.df.volatility_rank.shift(-1)) \
+            .assign(vola_ratio=self.df.volatility//abs(self.df.mid_Close - self.df.mid_Open)) \
             .assign(vola_x_volume=lambda x: x.vola_ratio*x.volume) \
             .assign(shift_3_vxv= lambda x:
-        (x.volume+x.volume.shift(1)+x.volume.shift(2))/
+        (x.volume+x.volume.shift(1)+x.volume.shift(2))//
         ((x.volatility+x.volatility.shift(1)+x.volatility.shift(2))
          /(abs(x.mid_Close - x.mid_Open) +
            abs(x.mid_Close.shift(1) - x.mid_Open.shift(1)) +
-           abs(x.mid_Close.shift(2) - x.mid_Open.shift(2)))))
+           abs(x.mid_Close.shift(2) - x.mid_Open.shift(2))))).dropna()
 
 
 
 if __name__ == '__main__':
     v = Volatility(path=r'../data/EURUSD_Hourly.csv', resolution='H')
     v.insert(name='volatility', func=lambda:abs(v.df['mid_High']-v.df['mid_Close']), rank=True)
-    # print(v.volatility_rank_hour())
-    # print(v.volatility_rank_weekday())
     v.vola_x_volume()
-    v.df.to_csv(r'../data/EURUSD_H_VxV.csv')
-
+    #v.r_style_lg_validate(v.df.vola_x_volume, v.df.volatility_rank)
+    v.r_style_lg_validate(v.df.shift_3_vxv, v.df.volatility_rank)
     pass
 
 

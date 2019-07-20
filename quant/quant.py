@@ -1,4 +1,7 @@
 import pandas as pd
+from sklearn.linear_model import LogisticRegression as LR
+from sklearn.model_selection import train_test_split
+import statsmodels.api as sm
 
 
 class Quant():
@@ -17,7 +20,6 @@ class Quant():
         self.df['minute'] = _dt.dt.minute
         self.df['second'] = _dt.dt.second
 
-
     def add_mid(self, df):
         col_names = list(df.columns)
         types = set([c.split("_")[1] for c in col_names if "_" in c])
@@ -35,5 +37,27 @@ class Quant():
         if rank:
             rank_col_name = name +'_rank'
             self.df[rank_col_name] = pd.cut(self.df[name], 10, labels=range(1, 11))
+
+    def lg_validation(self, x, y):
+        x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8)
+        x_train = x_train.values.reshape(-1, 1)
+        y_train = y_train.get_values().reshape(-1, 1)
+        model = LR()
+        model.fit(x_train, y_train)
+
+        x_test = x_test.values.reshape(-1, 1)
+        y_test = y_test.get_values().reshape(-1, 1)
+        print(model.score(x_test, y_test))
+
+    def r_style_lg_validate(self, x, y):
+        max_x = max(x.values)
+        x = x/max_x
+        y = pd.Series(y.get_values()/10, index=y.index)
+        logit = sm.Logit(x, y)
+        result = logit.fit()
+        print(result.summary())
+
+
+
 
 
